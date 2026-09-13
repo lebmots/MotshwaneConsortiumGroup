@@ -1,0 +1,2 @@
+@model IEnumerable<ServiceItem>
+@{ ViewData["Title"]="Manage Services"; }<h1>Manage Freezers & Toilets</h1><div class="grid three">@foreach(var s in Model){<div class="card"><span class="pill">@s.Category</span><h3>@s.Name</h3><p>@s.Description</p><strong>From R @s.PriceFrom.ToString("N0")</strong></div>}</div>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>@ViewData["Title"] - Motshwane Consortium</title>
+<link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+<header class="topbar"><div class="nav-inner"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">MC</span><span>Motshwane Consortium</span></a><nav class="main-nav"><a asp-controller="Home" asp-action="Index">Home</a><a asp-controller="Customer" asp-action="Dashboard">Customer</a><a asp-controller="Admin" asp-action="Dashboard">Admin</a><a asp-controller="Staff" asp-action="Dashboard">Staff</a></nav></div></header>
+<main class="container">@if (TempData["Message"] is string message) { <div class="alert success">@message</div> } @RenderBody()</main>
+<footer>© 2026 Motshwane Consortium<br/><small>Mobile Freezer & Toilet Management System</small></footer>
+</body>
+</html>

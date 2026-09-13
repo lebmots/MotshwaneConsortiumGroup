@@ -1,0 +1,2 @@
+@model IEnumerable<Booking>
+@{ ViewData["Title"]="Reports"; }<h1>Reports</h1><div class="stats"><div class="stat"><strong>@Model.Count()</strong><span>Bookings</span></div><div class="stat"><strong>@Model.Count(x=>x.Service.Contains("Freezer"))</strong><span>Freezer Requests</span></div><div class="stat"><strong>@Model.Count(x=>x.Service.Contains("Toilet"))</strong><span>Toilet Requests</span></div></div>

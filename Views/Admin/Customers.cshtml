@@ -1,0 +1,2 @@
+@model IEnumerable<Customer>
+@{ ViewData["Title"]="Customers"; }<h1>Manage Customers</h1><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th></tr></thead><tbody>@foreach(var c in Model){<tr><td>@c.Name</td><td>@c.Email</td><td>@c.Phone</td></tr>}</tbody></table></div>

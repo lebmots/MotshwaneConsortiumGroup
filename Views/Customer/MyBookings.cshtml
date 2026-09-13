@@ -1,0 +1,2 @@
+@model IEnumerable<Booking>
+@{ ViewData["Title"]="My Bookings"; }<h1>My Bookings</h1><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Service</th><th>Date</th><th>Location</th><th>Status</th><th>Payment</th></tr></thead><tbody>@foreach(var b in Model){<tr><td><strong>@b.Reference</strong></td><td>@b.Service</td><td>@b.BookingDate.ToString("dd MMM yyyy")</td><td>@b.Location</td><td><span class="status">@b.Status</span></td><td>@b.PaymentStatus</td></tr>}</tbody></table></div>

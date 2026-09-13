@@ -1,0 +1,2 @@
+@model IEnumerable<StaffJob>
+@{ ViewData["Title"]="Assigned Jobs"; }<h1>Assigned Jobs</h1><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Service</th><th>Location</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>@foreach(var j in Model){<tr><td>@j.Reference</td><td>@j.Service</td><td>@j.Location</td><td>@j.Date.ToString("dd MMM yyyy")</td><td>@j.Status</td><td><a href="/Staff/JobDetails?id=@j.Id">Details</a></td></tr>}</tbody></table></div>

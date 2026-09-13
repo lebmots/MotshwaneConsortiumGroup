@@ -1,0 +1,5 @@
+@model IEnumerable<Booking>
+@{ ViewData["Title"]="Customer Dashboard"; }
+<div class="page-head"><div><span class="eyebrow">CUSTOMER PORTAL</span><h1>Customer Dashboard</h1><p>Manage bookings and services.</p></div><a class="btn" href="/Customer/Booking">New Booking</a></div>
+<div class="stats"><div class="stat"><strong>@Model.Count()</strong><span>Total Bookings</span></div><div class="stat"><strong>@Model.Count(x=>x.Status=="Confirmed")</strong><span>Confirmed</span></div><div class="stat"><strong>@Model.Count(x=>x.PaymentStatus=="Paid")</strong><span>Paid</span></div></div>
+<div class="grid four"><a class="card linkcard" href="/Customer/Browse"><h3>Browse Services</h3></a><a class="card linkcard" href="/Customer/Booking"><h3>Make a Booking</h3></a><a class="card linkcard" href="/Customer/UploadProof"><h3>Upload Payment</h3></a><a class="card linkcard" href="/Customer/MyBookings"><h3>My Bookings</h3></a></div>
