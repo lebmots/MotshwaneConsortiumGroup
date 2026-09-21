@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
-using MotshwaneConsortiumGroup.Services;
+using MotshwaneConsortiumGroup.Services.Interfaces;
 namespace MotshwaneConsortiumGroup.Controllers;
 public class CustomerController : Controller
 {
-    private readonly DemoDataService _data;
-    public CustomerController(DemoDataService data) => _data = data;
-    public IActionResult Dashboard() => View(_data.Bookings);
+    private readonly IBookingService _bookings;
+    private readonly ICatalogService _catalog;
+    public CustomerController(IBookingService bookings, ICatalogService catalog)
+    {
+        _bookings = bookings;
+        _catalog = catalog;
+    }
+    public async Task<IActionResult> Dashboard() => View(await _bookings.GetAllAsync());
     [HttpGet] public IActionResult Register() => View();
     [HttpPost, ValidateAntiForgeryToken]
     public IActionResult Register(string name, string phone, string email, string password)
@@ -23,10 +28,10 @@ public class CustomerController : Controller
         { ModelState.AddModelError("", "Please enter your email and password."); return View(); }
         return RedirectToAction(nameof(Dashboard));
     }
-    public IActionResult Browse(string? category)
+    public async Task<IActionResult> Browse(string? category)
     {
-        var services = string.IsNullOrWhiteSpace(category) ? _data.Services : _data.Services.Where(x => x.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
-        ViewBag.Category = category; return View(services);
+        ViewBag.Category = category;
+        return View(await _catalog.GetServicesAsync(category));
     }
     [HttpGet] public IActionResult Booking() => View();
     [HttpPost, ValidateAntiForgeryToken]
@@ -48,5 +53,5 @@ public class CustomerController : Controller
         return RedirectToAction(nameof(MyBookings));
     }
     public IActionResult Confirmation() => View();
-    public IActionResult MyBookings() => View(_data.Bookings);
+    public async Task<IActionResult> MyBookings() => View(await _bookings.GetAllAsync());
 }

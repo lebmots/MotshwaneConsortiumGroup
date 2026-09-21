@@ -1,8 +1,8 @@
-using MotshwaneConsortiumGroup.Services;
+using MotshwaneConsortiumGroup.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<DemoDataService>();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 if (!app.Environment.IsDevelopment())
