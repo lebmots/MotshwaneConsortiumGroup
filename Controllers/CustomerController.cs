@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MotshwaneConsortiumGroup.Models;
 using MotshwaneConsortiumGroup.Services.Interfaces;
 namespace MotshwaneConsortiumGroup.Controllers;
 public class CustomerController : Controller
@@ -35,11 +36,32 @@ public class CustomerController : Controller
     }
     [HttpGet] public IActionResult Booking() => View();
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult Booking(string name, string service, DateTime date, string location, string? notes)
+    public async Task<IActionResult> Booking(string name, string service, DateTime date, string location, string? notes)
     {
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(service) || string.IsNullOrWhiteSpace(location) || date.Date < DateTime.Today)
         { ModelState.AddModelError("", "Please complete all required fields and choose a valid date."); return View(); }
-        TempData["BookingReference"] = "MC-" + Random.Shared.Next(100,999);
+
+        // The form only collects a service NAME and one date today (no end date or unit id yet).
+        // TODO(Lebone/Keren): add an End Date field and post ServiceItemId once it's on the form;
+        // until then this assumes a 1-day rental and looks the item up by name.
+        var match = (await _catalog.GetServicesAsync()).FirstOrDefault(
+            s => s.Name.Equals(service, StringComparison.OrdinalIgnoreCase));
+        if (match is null)
+        { ModelState.AddModelError("", "Selected service does not exist."); return View(); }
+
+        var result = await _bookings.CreateAsync(new NewBookingRequest
+        {
+            CustomerName = name,
+            ServiceItemId = match.Id,
+            Location = location,
+            StartDate = date,
+            EndDate = date.AddDays(1),
+        });
+
+        if (!result.Success)
+        { ModelState.AddModelError("", result.Error!); return View(); }
+
+        TempData["BookingReference"] = result.Value!.Reference;
         TempData["BookingService"] = service;
         return RedirectToAction(nameof(Confirmation));
     }

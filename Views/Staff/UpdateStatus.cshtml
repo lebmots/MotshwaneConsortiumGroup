@@ -1,2 +1,5 @@
 @model StaffJob
-@{ ViewData["Title"]="Update Status"; }<div class="form-page narrow"><h1>Update Job Status</h1><form method="post" class="formcard">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id"/><label>Status<select name="status"><option>Assigned</option><option>In Progress</option><option>Completed</option></select></label><label>Notes<textarea name="notes" rows="4"></textarea></label><button class="btn" type="submit">Save Status</button></form></div>
+@{ ViewData["Title"]="Update Status"; }<div class="form-page narrow"><h1>Update Job Status</h1>
+@if(TempData["Error"] != null){<div class="alert error">@TempData["Error"]</div>}
+<p>Current status: <strong>@Model.Status</strong></p>
+<form method="post" class="formcard">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id"/><label>Status<select name="status"><option>Assigned</option><option>In Progress</option><option>Delivered</option><option>Completed</option></select></label><label>Notes<textarea name="notes" rows="4"></textarea></label><button class="btn" type="submit">Save Status</button></form></div>

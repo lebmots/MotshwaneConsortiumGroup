@@ -19,7 +19,12 @@ public class StaffController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateStatus(int id, string status, string? notes)
     {
-        await _jobs.UpdateStatusAsync(id, status);
+        var result = await _jobs.UpdateStatusAsync(id, status);
+        if (!result.Success)
+        {
+            TempData["Error"] = result.Error;
+            return RedirectToAction(nameof(UpdateStatus), new { id });
+        }
         TempData["Message"] = "Job status updated successfully";
         return RedirectToAction(nameof(Jobs));
     }

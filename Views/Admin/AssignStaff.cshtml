@@ -1,2 +1,7 @@
 @model IEnumerable<Booking>
-@{ ViewData["Title"]="Assign Staff"; }<h1>Assign Staff</h1><div class="grid three">@foreach(var b in Model){<div class="card"><span class="pill">@b.Reference</span><h3>@b.Service</h3><p>@b.Location · @b.BookingDate.ToString("dd MMM yyyy")</p><select><option>Select Staff Member</option><option>Staff Member 1</option><option>Staff Member 2</option></select><button class="btn small" type="button">Assign</button></div>}</div>
+@{ ViewData["Title"]="Assign Staff"; }<h1>Assign Staff</h1>
+@if(TempData["Message"] != null){<div class="alert">@TempData["Message"]</div>}
+@if(TempData["Error"] != null){<div class="alert error">@TempData["Error"]</div>}
+<div class="grid three">@foreach(var b in Model){<div class="card"><span class="pill">@b.Reference</span><h3>@b.Service</h3><p>@b.Location · @b.BookingDate.ToString("dd MMM yyyy")</p><p class="pill">@b.Status</p>
+<form method="post" asp-action="AssignStaff">@Html.AntiForgeryToken()<input type="hidden" name="bookingId" value="@b.Id" /><select name="staffId" required><option value="">Select Staff Member</option>@foreach(var s in (IEnumerable<Staff>)ViewBag.Staff){<option value="@s.Id">@s.Name</option>}</select><button class="btn small" type="submit">Assign</button></form>
+</div>}</div>
