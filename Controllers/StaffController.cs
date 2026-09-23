@@ -1,21 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
-using MotshwaneConsortiumGroup.Services;
+using MotshwaneConsortiumGroup.Services.Interfaces;
 namespace MotshwaneConsortiumGroup.Controllers;
 public class StaffController : Controller
 {
-    private readonly DemoDataService _data;
-    public StaffController(DemoDataService data) => _data = data;
-    public IActionResult Dashboard() => View(_data.Jobs);
-    public IActionResult Jobs() => View(_data.Jobs);
-    public IActionResult JobDetails(int id=1) => View(_data.Jobs.FirstOrDefault(x => x.Id == id) ?? _data.Jobs.First());
-    [HttpGet] public IActionResult UpdateStatus(int id=1) => View(_data.Jobs.FirstOrDefault(x => x.Id == id) ?? _data.Jobs.First());
+    private readonly IStaffJobService _jobs;
+    public StaffController(IStaffJobService jobs) => _jobs = jobs;
+
+    public async Task<IActionResult> Dashboard() => View(await _jobs.GetAllAsync());
+    public async Task<IActionResult> Jobs() => View(await _jobs.GetAllAsync());
+
+    public async Task<IActionResult> JobDetails(int id = 1) =>
+        View(await _jobs.GetByIdAsync(id) ?? (await _jobs.GetAllAsync()).First());
+
+    [HttpGet]
+    public async Task<IActionResult> UpdateStatus(int id = 1) =>
+        View(await _jobs.GetByIdAsync(id) ?? (await _jobs.GetAllAsync()).First());
+
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult UpdateStatus(int id, string status, string? notes)
+    public async Task<IActionResult> UpdateStatus(int id, string status, string? notes)
     {
-        var job = _data.Jobs.FirstOrDefault(x => x.Id == id);
-        if (job is not null && !string.IsNullOrWhiteSpace(status)) job.Status = status;
+        await _jobs.UpdateStatusAsync(id, status);
         TempData["Message"] = "Job status updated successfully";
         return RedirectToAction(nameof(Jobs));
     }
+
     public IActionResult Profile() => View();
 }

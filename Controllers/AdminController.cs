@@ -1,15 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
-using MotshwaneConsortiumGroup.Services;
+using MotshwaneConsortiumGroup.Services.Interfaces;
 namespace MotshwaneConsortiumGroup.Controllers;
 public class AdminController : Controller
 {
-    private readonly DemoDataService _data;
-    public AdminController(DemoDataService data) => _data = data;
-    public IActionResult Dashboard() => View(_data.Bookings);
-    public IActionResult Bookings() => View(_data.Bookings);
-    public IActionResult Services() => View(_data.Services);
-    public IActionResult Customers() => View(_data.Customers);
-    public IActionResult Payments() => View(_data.Bookings);
-    public IActionResult AssignStaff() => View(_data.Bookings);
-    public IActionResult Reports() => View(_data.Bookings);
+    private readonly IBookingService _bookings;
+    private readonly ICatalogService _catalog;
+    private readonly ICustomerService _customers;
+
+    public AdminController(IBookingService bookings, ICatalogService catalog, ICustomerService customers)
+    {
+        _bookings = bookings;
+        _catalog = catalog;
+        _customers = customers;
+    }
+
+    public async Task<IActionResult> Dashboard() => View(await _bookings.GetAllAsync());
+    public async Task<IActionResult> Bookings() => View(await _bookings.GetAllAsync());
+    public async Task<IActionResult> Services() => View(await _catalog.GetServicesAsync());
+    public async Task<IActionResult> Customers() => View(await _customers.GetAllAsync());
+    public async Task<IActionResult> Payments() => View(await _bookings.GetAllAsync());
+    public async Task<IActionResult> AssignStaff() => View(await _bookings.GetAllAsync());
+    public async Task<IActionResult> Reports() => View(await _bookings.GetAllAsync());
 }
