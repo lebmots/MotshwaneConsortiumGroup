@@ -31,3 +31,15 @@ public static class JobStatus
         return to == from + 1;
     }
 }
+
+/// <summary>
+/// Allowed values for Payment.Status. AwaitingProof -> ProofSubmitted -> Approved/Rejected.
+/// A Rejected payment can be resubmitted (back to ProofSubmitted) if the customer uploads new proof.
+/// </summary>
+public static class PaymentStatus
+{
+    public const string AwaitingProof = "Awaiting Proof";
+    public const string ProofSubmitted = "Proof Submitted";
+    public const string Approved = "Approved";
+    public const string Rejected = "Rejected";
+}

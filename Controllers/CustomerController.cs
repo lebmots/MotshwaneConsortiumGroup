@@ -6,10 +6,14 @@ public class CustomerController : Controller
 {
     private readonly IBookingService _bookings;
     private readonly ICatalogService _catalog;
-    public CustomerController(IBookingService bookings, ICatalogService catalog)
+    private readonly IPaymentService _payments;
+    private readonly IFileStorageService _fileStorage;
+    public CustomerController(IBookingService bookings, ICatalogService catalog, IPaymentService payments, IFileStorageService fileStorage)
     {
         _bookings = bookings;
         _catalog = catalog;
+        _payments = payments;
+        _fileStorage = fileStorage;
     }
     public async Task<IActionResult> Dashboard() => View(await _bookings.GetAllAsync());
     [HttpGet] public IActionResult Register() => View();
@@ -67,10 +71,20 @@ public class CustomerController : Controller
     }
     [HttpGet] public IActionResult UploadProof() => View();
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult UploadProof(string reference, IFormFile? proof)
+    public async Task<IActionResult> UploadProof(string reference, IFormFile? proof)
     {
         if (string.IsNullOrWhiteSpace(reference) || proof is null || proof.Length == 0)
         { ModelState.AddModelError("", "Please enter a booking reference and choose a file."); return View(); }
+
+        await using var stream = proof.OpenReadStream();
+        var saveResult = await _fileStorage.SaveAsync(stream, proof.FileName, proof.ContentType, proof.Length);
+        if (!saveResult.Success)
+        { ModelState.AddModelError("", saveResult.Error!); return View(); }
+
+        var submitResult = await _payments.SubmitProofAsync(reference, saveResult.Value!);
+        if (!submitResult.Success)
+        { ModelState.AddModelError("", submitResult.Error!); return View(); }
+
         TempData["Message"] = "Proof of payment submitted successfully";
         return RedirectToAction(nameof(MyBookings));
     }
