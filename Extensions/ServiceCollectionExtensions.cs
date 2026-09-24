@@ -1,4 +1,5 @@
 using MotshwaneConsortiumGroup.Services;
+using MotshwaneConsortiumGroup.Services.FileSystem;
 using MotshwaneConsortiumGroup.Services.InMemory;
 using MotshwaneConsortiumGroup.Services.Interfaces;
 
@@ -23,6 +24,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICustomerService, InMemoryCustomerService>();
         services.AddScoped<IStaffJobService, InMemoryStaffJobService>();
         services.AddScoped<IStaffService, InMemoryStaffService>();
+        services.AddScoped<IPaymentService, InMemoryPaymentService>();
+        services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         return services;
     }
