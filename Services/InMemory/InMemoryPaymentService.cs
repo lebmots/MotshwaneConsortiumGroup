@@ -7,7 +7,11 @@ public class InMemoryPaymentService : IPaymentService
 {
     // Kept separately from DemoDataService (Lebone's file) so we don't need to edit it.
     // Swap for an EF Core-backed (or Firebase-backed) implementation later behind the same interface.
-    private static readonly List<Payment> _payments = new();
+    // Instance-level (not static) list: this service is registered as a Singleton in DI (see
+    // ServiceCollectionExtensions), so one instance lives for the app's lifetime and this list
+    // persists across requests the same way DemoDataService does. A static list would leak state
+    // across unrelated instances (e.g. in tests, where each test creates its own DemoDataService).
+    private readonly List<Payment> _payments = new();
     private readonly DemoDataService _data;
 
     public InMemoryPaymentService(DemoDataService data) => _data = data;

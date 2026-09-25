@@ -4,4 +4,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-</Project>
+  <ItemGroup>
+    <Compile Remove="MotshwaneConsortiumGroup.Tests/**" />
+    <Content Remove="MotshwaneConsortiumGroup.Tests/**" />
+    <EmbeddedResource Remove="MotshwaneConsortiumGroup.Tests/**" />
+    <None Remove="MotshwaneConsortiumGroup.Tests/**" />
+  </ItemGroup>
+ </Project>
