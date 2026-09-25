@@ -10,4 +10,7 @@
     <EmbeddedResource Remove="MotshwaneConsortiumGroup.Tests/**" />
     <None Remove="MotshwaneConsortiumGroup.Tests/**" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\workflows\build-and-test.yml" />
+  </ItemGroup>
  </Project>

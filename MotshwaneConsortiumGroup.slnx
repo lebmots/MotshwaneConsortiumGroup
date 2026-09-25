@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../../../Documents/Backend_Week6_tests/MotshwaneConsortiumGroup.Tests/MotshwaneConsortiumGroup.Tests.csproj" />
   <Project Path="MotshwaneConsortiumGroup.csproj" />
+  <Project Path="MotshwaneConsortiumGroup.Tests/MotshwaneConsortiumGroup.Tests.csproj" />
 </Solution>
