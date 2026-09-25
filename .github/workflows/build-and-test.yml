@@ -1,0 +1,31 @@
+name: Build and Test
+
+# Runs on every push and pull request into master or develop, so a broken build
+# or a failing test shows up on GitHub before it gets merged.
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build (main app)
+        run: dotnet build MotshwaneConsortiumGroup.csproj --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test MotshwaneConsortiumGroup.Tests/MotshwaneConsortiumGroup.Tests.csproj --no-restore --configuration Release --verbosity normal
