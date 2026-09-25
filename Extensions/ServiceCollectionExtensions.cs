@@ -24,7 +24,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICustomerService, InMemoryCustomerService>();
         services.AddScoped<IStaffJobService, InMemoryStaffJobService>();
         services.AddScoped<IStaffService, InMemoryStaffService>();
-        services.AddScoped<IPaymentService, InMemoryPaymentService>();
+        // Singleton: this in-memory service needs to keep its payments list alive across requests,
+        // the same way DemoDataService does. Switch back to Scoped once the EF Core/Firebase version
+        // (which reads from the database instead of an in-process list) replaces it.
+        services.AddSingleton<IPaymentService, InMemoryPaymentService>();
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         return services;

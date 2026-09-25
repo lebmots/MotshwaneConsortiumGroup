@@ -56,14 +56,21 @@ public class InMemoryBookingService : IBookingService
 
     public Task<bool> IsAvailableAsync(int serviceItemId, DateTime start, DateTime end, int? excludeBookingId = null)
     {
-        // Old seed bookings have EndDate == default; treat them as a single-day booking (EndDate = BookingDate)
-        // so they still correctly block overlapping dates instead of matching every range.
         bool overlaps = _data.Bookings.Any(b =>
-            b.Id != excludeBookingId &&
-            b.ServiceItemId == serviceItemId &&
-            b.Status != BookingStatus.Cancelled &&
-            start.Date < (b.EndDate == default ? b.BookingDate : b.EndDate).Date.AddDays(1) &&
-            end.Date > b.BookingDate.Date);
+        {
+            if (b.Id == excludeBookingId) return false;
+            if (b.ServiceItemId != serviceItemId) return false;
+            if (b.Status == BookingStatus.Cancelled) return false;
+
+            // Old seed bookings have EndDate == default; treat them as a single-day booking
+            // (occupying BookingDate -> BookingDate+1) so they still correctly block overlapping
+            // dates instead of matching every range. A booking with a real EndDate uses it as-is —
+            // adding +1 here too would treat two back-to-back bookings (one ending the day the next
+            // starts) as overlapping, which they aren't.
+            var effectiveEnd = b.EndDate == default ? b.BookingDate.AddDays(1) : b.EndDate;
+
+            return start.Date < effectiveEnd.Date && end.Date > b.BookingDate.Date;
+        });
 
         return Task.FromResult(!overlaps);
     }
