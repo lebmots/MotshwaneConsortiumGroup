@@ -1,2 +1,2 @@
 @model IEnumerable<Booking>
-@{ ViewData["Title"]="Payments"; }<h1>Manage Payments</h1><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Customer</th><th>Payment Status</th><th>Booking Status</th></tr></thead><tbody>@foreach(var b in Model){<tr><td>@b.Reference</td><td>@b.CustomerName</td><td>@b.PaymentStatus</td><td>@b.Status</td></tr>}</tbody></table></div>
+@{ ViewData["Title"]="Payments"; }<h1>Manage Payments</h1><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Customer</th><th>Payment Status</th><th>Booking Status</th></tr></thead><tbody>@foreach(var b in Model){<tr><td>@b.Reference</td><td>@b.Customer.User.FullName</td><td>@b.PaymentStatus</td><td>@b.Status</td></tr>}</tbody></table></div>
