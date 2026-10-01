@@ -2,7 +2,7 @@ using MotshwaneConsortiumGroup.Models;
 namespace MotshwaneConsortiumGroup.Services;
 public class DemoDataService
 {
-    public List<ServiceItem> Services { get; } = new()
+    public List<Unit> Units { get; } = new()
     {
         new() { Id=1, Name="Mobile Freezer", Category="Freezer", Description="Portable cold-storage solution for events and temporary sites.", PriceFrom=750, Available=true },
         new() { Id=2, Name="Mobile Toilet", Category="Toilet", Description="Clean and convenient mobile sanitation unit.", PriceFrom=500, Available=true },
