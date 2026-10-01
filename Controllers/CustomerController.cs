@@ -25,7 +25,7 @@ public class CustomerController : Controller
     }
     public IActionResult Browse(string? category)
     {
-        var services = string.IsNullOrWhiteSpace(category) ? _data.Services : _data.Services.Where(x => x.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+        var services = string.IsNullOrWhiteSpace(category) ? _data.Units : _data.Units.Where(x => x.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
         ViewBag.Category = category; return View(services);
     }
     [HttpGet] public IActionResult Booking() => View();
