@@ -2,9 +2,11 @@ namespace MotshwaneConsortiumGroup.Models;
 public class StaffJob
 {
     public int Id { get; set; }
-    public string Reference { get; set; } = "";
-    public string Service { get; set; } = "";
-    public string Location { get; set; } = "";
-    public DateTime Date { get; set; }
+    public int BookingId { get; set; }
+    public int? StaffUserId { get; set; }
     public string Status { get; set; } = "Assigned";
+    public string? Notes { get; set; }
+    public Booking Booking { get; set; } = null!;
+  
+    
 }
