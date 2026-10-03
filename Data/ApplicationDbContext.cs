@@ -65,6 +65,15 @@ namespace MotshwaneConsortiumGroup.Data
 
             modelBuilder.Entity<Unit>()
                 .HasIndex(u => u.Category);
+
+            modelBuilder.Entity<StaffJob>()
+                .HasOne(s => s.Booking)
+                .WithMany()
+                .HasForeignKey(s => s.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StaffJob>()
+                .HasIndex(s => s.BookingId);
         }
     }
 }

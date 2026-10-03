@@ -1,4 +1,47 @@
-@model IEnumerable<Customer>
-@{ ViewData["Title"]="Customers"; }<h1>Manage Customers</h1><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th></tr></thead><tbody>@foreach(var c in Model){<tr><td>@c.User.FullName</td><td>@c.User.Email</td><td>@c.Phone</td></tr>}</tbody></table></div>
+@model IEnumerable<MotshwaneConsortiumGroup.Models.Customer>
 
+@{
+    ViewData["Title"] = "Customers";
+}
 
+<h1>Manage Customers</h1>
+
+<div class="table-wrap">
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if (Model.Any())
+            {
+                foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>@customer.User?.FullName</td>
+                        <td>@customer.User?.Email</td>
+                        <td>@customer.Phone</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">
+                        No customers found.
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
