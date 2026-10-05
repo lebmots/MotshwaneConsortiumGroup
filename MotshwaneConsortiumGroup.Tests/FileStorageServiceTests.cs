@@ -77,8 +77,6 @@ public class FileStorageServiceTests
     [Fact]
     public async Task SaveAsync_GeneratesADifferentNameThanTheOriginal()
     {
-        // The saved (server-side) file name should never be the customer-supplied name —
-        // that's what stops someone guessing another customer's proof file URL.
         var service = CreateService();
         await using var stream = StreamOf(ValidPdfBytes());
 
@@ -92,7 +90,7 @@ public class FileStorageServiceTests
     public async Task SaveAsync_WithAnUnsupportedExtension_Fails()
     {
         var service = CreateService();
-        await using var stream = StreamOf(ValidPdfBytes()); // content doesn't matter, extension is checked first
+        await using var stream = StreamOf(ValidPdfBytes());
 
         var result = await service.SaveAsync(stream, "proof.exe", "application/octet-stream", stream.Length);
 
@@ -103,7 +101,6 @@ public class FileStorageServiceTests
     [Fact]
     public async Task SaveAsync_WithAPdfExtensionButWrongContent_Fails()
     {
-        // Simulates renaming another file type to .pdf to slip past an extension-only check.
         var service = CreateService();
         var fakeContent = System.Text.Encoding.ASCII.GetBytes("MZ\x90\x00this is actually an exe");
         await using var stream = StreamOf(fakeContent);
@@ -119,7 +116,7 @@ public class FileStorageServiceTests
     {
         var service = CreateService();
         var oversized = System.Text.Encoding.ASCII.GetBytes("%PDF-1.4\n")
-            .Concat(new byte[6 * 1024 * 1024]).ToArray(); // 6MB, over the 5MB cap
+            .Concat(new byte[6 * 1024 * 1024]).ToArray();
         await using var stream = StreamOf(oversized);
 
         var result = await service.SaveAsync(stream, "big.pdf", "application/pdf", oversized.Length);

@@ -1,13 +1,14 @@
 namespace MotshwaneConsortiumGroup.Models;
 
-/// <summary>Proof-of-payment record for a booking. One booking has at most one active payment.</summary>
 public class Payment
 {
     public int Id { get; set; }
     public int BookingId { get; set; }
-    public string Status { get; set; } = MotshwaneConsortiumGroup.Models.PaymentStatus.AwaitingProof;
-    /// <summary>Server-generated file name under the upload folder — never the customer's original name.</summary>
-    public string? ProofFilePath { get; set; }
-    public DateTime? SubmittedAt { get; set; }
+    public decimal Amount { get; set; }
+    public string Status { get; set; } = Models.PaymentStatus.AwaitingProof;
+    public string? ProofOfPaymentPath { get; set; }
+    public DateTime? PaymentDate { get; set; }
+    /// <summary>Added on top of Thato's schema so the Week 4 reject flow can record why.</summary>
     public string? RejectionReason { get; set; }
+    public Booking Booking { get; set; } = null!;
 }
