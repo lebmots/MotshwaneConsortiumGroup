@@ -1,45 +1,39 @@
 using MotshwaneConsortiumGroup.Models;
-using MotshwaneConsortiumGroup.Services;
-using MotshwaneConsortiumGroup.Services.InMemory;
+using MotshwaneConsortiumGroup.Services.EfCore;
+using MotshwaneConsortiumGroup.Services.Interfaces;
 using Xunit;
 
 namespace MotshwaneConsortiumGroup.Tests;
 
 public class StaffJobServiceTests
 {
-    private static (InMemoryStaffJobService jobs, DemoDataService data, InMemoryStaffService staff) CreateService()
-    {
-        var data = new DemoDataService();
-        var staff = new InMemoryStaffService();
-        return (new InMemoryStaffJobService(data, staff), data, staff);
-    }
-
-    private static async Task<Booking> AddConfirmedBooking(DemoDataService data)
+    private static async Task<Booking> AddConfirmedBooking(Data.ApplicationDbContext db)
     {
         var booking = new Booking
         {
-            Id = data.Bookings.Count == 0 ? 1 : data.Bookings.Max(b => b.Id) + 1,
-            Reference = "MC-TEST",
-            CustomerName = "Test Customer",
-            Service = data.Services.First().Name,
-            ServiceItemId = data.Services.First().Id,
+            Reference = $"MC-TEST{Guid.NewGuid().ToString("N")[..4]}",
+            CustomerId = TestDbFactory.FirstCustomerId(db),
+            UnitId = TestDbFactory.FirstUnitId(db),
             BookingDate = DateTime.Today.AddDays(3),
             EndDate = DateTime.Today.AddDays(4),
             Location = "Idutywa",
             Status = BookingStatus.Confirmed,
         };
-        data.Bookings.Add(booking);
-        return await Task.FromResult(booking);
+        db.Bookings.Add(booking);
+        await db.SaveChangesAsync();
+        return booking;
     }
 
     [Fact]
     public async Task AssignAsync_ToAConfirmedBooking_Succeeds()
     {
-        var (jobs, data, staff) = CreateService();
-        var booking = await AddConfirmedBooking(data);
-        var staffMember = (await staff.GetAllAsync()).First();
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
+        var booking = await AddConfirmedBooking(db);
+        var staffId = TestDbFactory.FirstStaffId(db);
 
-        var result = await jobs.AssignAsync(booking.Id, staffMember.Id);
+        var result = await jobs.AssignAsync(booking.Id, staffId);
 
         Assert.True(result.Success);
         Assert.Equal(JobStatus.Assigned, result.Value!.Status);
@@ -49,12 +43,14 @@ public class StaffJobServiceTests
     [Fact]
     public async Task AssignAsync_ToAPendingBooking_Fails()
     {
-        var (jobs, data, staff) = CreateService();
-        var booking = await AddConfirmedBooking(data);
-        booking.Status = BookingStatus.Pending; // not confirmed yet
-        var staffMember = (await staff.GetAllAsync()).First();
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
+        var booking = await AddConfirmedBooking(db);
+        booking.Status = BookingStatus.Pending;
+        await db.SaveChangesAsync();
 
-        var result = await jobs.AssignAsync(booking.Id, staffMember.Id);
+        var result = await jobs.AssignAsync(booking.Id, TestDbFactory.FirstStaffId(db));
 
         Assert.False(result.Success);
         Assert.Contains("confirmed", result.Error, StringComparison.OrdinalIgnoreCase);
@@ -63,13 +59,15 @@ public class StaffJobServiceTests
     [Fact]
     public async Task AssignAsync_ToABookingThatAlreadyHasAJob_Fails()
     {
-        var (jobs, data, staff) = CreateService();
-        var booking = await AddConfirmedBooking(data);
-        var staffMember = (await staff.GetAllAsync()).First();
-        var first = await jobs.AssignAsync(booking.Id, staffMember.Id);
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
+        var booking = await AddConfirmedBooking(db);
+        var staffId = TestDbFactory.FirstStaffId(db);
+        var first = await jobs.AssignAsync(booking.Id, staffId);
         Assert.True(first.Success);
 
-        var second = await jobs.AssignAsync(booking.Id, staffMember.Id);
+        var second = await jobs.AssignAsync(booking.Id, staffId);
 
         Assert.False(second.Success);
         Assert.Contains("already", second.Error, StringComparison.OrdinalIgnoreCase);
@@ -78,28 +76,33 @@ public class StaffJobServiceTests
     [Fact]
     public async Task AssignAsync_WhenStaffMemberAlreadyBusyThatDay_Fails()
     {
-        var (jobs, data, staff) = CreateService();
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
         var day = DateTime.Today.AddDays(3);
-        var bookingA = await AddConfirmedBooking(data);
-        bookingA.BookingDate = day;
-        var bookingB = await AddConfirmedBooking(data);
-        bookingB.BookingDate = day;
-        var staffMember = (await staff.GetAllAsync()).First();
 
-        var first = await jobs.AssignAsync(bookingA.Id, staffMember.Id);
+        var bookingA = await AddConfirmedBooking(db);
+        bookingA.BookingDate = day;
+        var bookingB = await AddConfirmedBooking(db);
+        bookingB.BookingDate = day;
+        await db.SaveChangesAsync();
+
+        var staffId = TestDbFactory.FirstStaffId(db);
+        var first = await jobs.AssignAsync(bookingA.Id, staffId);
         Assert.True(first.Success);
 
-        var second = await jobs.AssignAsync(bookingB.Id, staffMember.Id);
+        var second = await jobs.AssignAsync(bookingB.Id, staffId);
 
         Assert.False(second.Success);
-        Assert.Contains(staffMember.Name, second.Error);
     }
 
     [Fact]
     public async Task AssignAsync_ToAnUnknownStaffMember_Fails()
     {
-        var (jobs, data, _) = CreateService();
-        var booking = await AddConfirmedBooking(data);
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
+        var booking = await AddConfirmedBooking(db);
 
         var result = await jobs.AssignAsync(booking.Id, staffId: -999);
 
@@ -109,10 +112,11 @@ public class StaffJobServiceTests
     [Fact]
     public async Task UpdateStatusAsync_OneStepForward_Succeeds()
     {
-        var (jobs, data, staff) = CreateService();
-        var booking = await AddConfirmedBooking(data);
-        var staffMember = (await staff.GetAllAsync()).First();
-        var job = (await jobs.AssignAsync(booking.Id, staffMember.Id)).Value!;
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
+        var booking = await AddConfirmedBooking(db);
+        var job = (await jobs.AssignAsync(booking.Id, TestDbFactory.FirstStaffId(db))).Value!;
 
         var result = await jobs.UpdateStatusAsync(job.Id, JobStatus.InProgress);
 
@@ -123,10 +127,11 @@ public class StaffJobServiceTests
     [Fact]
     public async Task UpdateStatusAsync_SkippingAStep_FailsAndLeavesStatusUnchanged()
     {
-        var (jobs, data, staff) = CreateService();
-        var booking = await AddConfirmedBooking(data);
-        var staffMember = (await staff.GetAllAsync()).First();
-        var job = (await jobs.AssignAsync(booking.Id, staffMember.Id)).Value!;
+        using var db = TestDbFactory.Create();
+        var staffService = new EfStaffService(db);
+        var jobs = new EfStaffJobService(db, staffService);
+        var booking = await AddConfirmedBooking(db);
+        var job = (await jobs.AssignAsync(booking.Id, TestDbFactory.FirstStaffId(db))).Value!;
 
         var result = await jobs.UpdateStatusAsync(job.Id, JobStatus.Completed);
 

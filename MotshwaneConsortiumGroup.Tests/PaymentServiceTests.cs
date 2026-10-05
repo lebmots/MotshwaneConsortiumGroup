@@ -1,57 +1,68 @@
 using MotshwaneConsortiumGroup.Models;
-using MotshwaneConsortiumGroup.Services;
-using MotshwaneConsortiumGroup.Services.InMemory;
+using MotshwaneConsortiumGroup.Services.EfCore;
+using MotshwaneConsortiumGroup.Services.Interfaces;
 using Xunit;
 
 namespace MotshwaneConsortiumGroup.Tests;
 
 public class PaymentServiceTests
 {
-    private static (InMemoryPaymentService payments, DemoDataService data) CreateService()
-    {
-        var data = new DemoDataService();
-        return (new InMemoryPaymentService(data), data);
-    }
-
-    private static Booking AddPendingBooking(DemoDataService data)
+    private static async Task<Booking> AddPendingBooking(Data.ApplicationDbContext db)
     {
         var booking = new Booking
         {
-            Id = data.Bookings.Count == 0 ? 1 : data.Bookings.Max(b => b.Id) + 1,
-            Reference = "MC-PAYTEST",
-            CustomerName = "Test Customer",
-            Service = data.Services.First().Name,
-            ServiceItemId = data.Services.First().Id,
+            Reference = $"MC-PAY{Guid.NewGuid().ToString("N")[..4]}",
+            CustomerId = TestDbFactory.FirstCustomerId(db),
+            UnitId = TestDbFactory.FirstUnitId(db),
             BookingDate = DateTime.Today.AddDays(3),
             EndDate = DateTime.Today.AddDays(4),
             Location = "Idutywa",
             Status = BookingStatus.Pending,
             PaymentStatus = PaymentStatus.AwaitingProof,
         };
-        data.Bookings.Add(booking);
+        db.Bookings.Add(booking);
+        await db.SaveChangesAsync();
         return booking;
     }
 
     [Fact]
     public async Task SubmitProofAsync_WithAValidReference_MovesBookingToProofSubmitted()
     {
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
 
-        var result = await payments.SubmitProofAsync(booking.Reference, "somefile.pdf");
+        var result = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
 
         Assert.True(result.Success);
         Assert.Equal(PaymentStatus.ProofSubmitted, result.Value!.Status);
-        Assert.Equal(PaymentStatus.ProofSubmitted, booking.PaymentStatus);
-        Assert.Equal("somefile.pdf", result.Value.ProofFilePath);
+        Assert.Equal("somefile.pdf", result.Value.ProofOfPaymentPath);
+
+        var reloaded = db.Bookings.First(b => b.Id == booking.Id);
+        Assert.Equal(PaymentStatus.ProofSubmitted, reloaded.PaymentStatus);
     }
 
     [Fact]
     public async Task SubmitProofAsync_WithAnUnknownReference_Fails()
     {
-        var (payments, _) = CreateService();
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var customerId = TestDbFactory.FirstCustomerId(db);
 
-        var result = await payments.SubmitProofAsync("MC-DOESNOTEXIST", "somefile.pdf");
+        var result = await payments.SubmitProofAsync("MC-DOESNOTEXIST", customerId, "somefile.pdf");
+
+        Assert.False(result.Success);
+    }
+
+    [Fact]
+    public async Task SubmitProofAsync_ForAnotherCustomersBooking_Fails()
+    {
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
+
+        // Wrong customer id — proves one customer can't submit proof against someone else's booking.
+        var result = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId + 999, "somefile.pdf");
 
         Assert.False(result.Success);
     }
@@ -59,11 +70,13 @@ public class PaymentServiceTests
     [Fact]
     public async Task SubmitProofAsync_WhenAlreadyApproved_Fails()
     {
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
         booking.PaymentStatus = PaymentStatus.Approved;
+        await db.SaveChangesAsync();
 
-        var result = await payments.SubmitProofAsync(booking.Reference, "somefile.pdf");
+        var result = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
 
         Assert.False(result.Success);
         Assert.Contains("already paid", result.Error, StringComparison.OrdinalIgnoreCase);
@@ -72,65 +85,26 @@ public class PaymentServiceTests
     [Fact]
     public async Task ApproveAsync_OnASubmittedPayment_ConfirmsTheBooking()
     {
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
-        var submitted = await payments.SubmitProofAsync(booking.Reference, "somefile.pdf");
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
+        var submitted = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
 
         var result = await payments.ApproveAsync(submitted.Value!.Id);
 
         Assert.True(result.Success);
         Assert.Equal(PaymentStatus.Approved, result.Value!.Status);
-        Assert.Equal(BookingStatus.Confirmed, booking.Status);
-        Assert.Equal("Paid", booking.PaymentStatus);
+
+        var reloaded = db.Bookings.First(b => b.Id == booking.Id);
+        Assert.Equal(BookingStatus.Confirmed, reloaded.Status);
+        Assert.Equal("Paid", reloaded.PaymentStatus);
     }
 
     [Fact]
     public async Task ApproveAsync_WithNoProofSubmittedYet_Fails()
     {
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
-        // Create a payment record without going through SubmitProofAsync, still AwaitingProof.
-        var payment = new Payment { Id = 1, BookingId = booking.Id, Status = PaymentStatus.AwaitingProof };
-
-        var result = await payments.ApproveAsync(payment.Id);
-
-        // No matching payment exists yet (list is empty), so this should fail — proves you can't
-        // approve a payment that was never submitted.
-        Assert.False(result.Success);
-    }
-
-    [Fact]
-    public async Task RejectAsync_OnASubmittedPayment_KeepsBookingPendingAndStoresReason()
-    {
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
-        var submitted = await payments.SubmitProofAsync(booking.Reference, "somefile.pdf");
-
-        var result = await payments.RejectAsync(submitted.Value!.Id, "Amount does not match");
-
-        Assert.True(result.Success);
-        Assert.Equal(PaymentStatus.Rejected, result.Value!.Status);
-        Assert.Equal("Amount does not match", result.Value.RejectionReason);
-        Assert.Equal(BookingStatus.Pending, booking.Status); // NOT confirmed
-        Assert.Equal(PaymentStatus.Rejected, booking.PaymentStatus);
-    }
-
-    [Fact]
-    public async Task RejectAsync_WithNoReason_Fails()
-    {
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
-        var submitted = await payments.SubmitProofAsync(booking.Reference, "somefile.pdf");
-
-        var result = await payments.RejectAsync(submitted.Value!.Id, "");
-
-        Assert.False(result.Success);
-    }
-
-    [Fact]
-    public async Task ApproveAsync_ANonExistentPayment_Fails()
-    {
-        var (payments, _) = CreateService();
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
 
         var result = await payments.ApproveAsync(-999);
 
@@ -138,16 +112,61 @@ public class PaymentServiceTests
     }
 
     [Fact]
+    public async Task RejectAsync_OnASubmittedPayment_KeepsBookingPendingAndStoresReason()
+    {
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
+        var submitted = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
+
+        var result = await payments.RejectAsync(submitted.Value!.Id, "Amount does not match");
+
+        Assert.True(result.Success);
+        Assert.Equal(PaymentStatus.Rejected, result.Value!.Status);
+        Assert.Equal("Amount does not match", result.Value.RejectionReason);
+
+        var reloaded = db.Bookings.First(b => b.Id == booking.Id);
+        Assert.Equal(BookingStatus.Pending, reloaded.Status);
+        Assert.Equal(PaymentStatus.Rejected, reloaded.PaymentStatus);
+    }
+
+    [Fact]
+    public async Task RejectAsync_WithNoReason_Fails()
+    {
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
+        var submitted = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
+
+        var result = await payments.RejectAsync(submitted.Value!.Id, "");
+
+        Assert.False(result.Success);
+    }
+
+    [Fact]
     public async Task ApproveAsync_ThenRejectAsync_OnTheSamePayment_Fails()
     {
-        // Once approved, a payment shouldn't be reject-able (it's already gone through).
-        var (payments, data) = CreateService();
-        var booking = AddPendingBooking(data);
-        var submitted = await payments.SubmitProofAsync(booking.Reference, "somefile.pdf");
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
+        var submitted = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
         await payments.ApproveAsync(submitted.Value!.Id);
 
         var result = await payments.RejectAsync(submitted.Value.Id, "changed my mind");
 
         Assert.False(result.Success);
+    }
+
+    [Fact]
+    public async Task SubmitProofAsync_SetsAmountFromTheUnitsPrice()
+    {
+        using var db = TestDbFactory.Create();
+        var payments = new EfPaymentService(db);
+        var booking = await AddPendingBooking(db);
+        var expectedPrice = db.Units.First(u => u.Id == booking.UnitId).PriceFrom;
+
+        var result = await payments.SubmitProofAsync(booking.Reference, booking.CustomerId, "somefile.pdf");
+
+        Assert.Equal(expectedPrice, result.Value!.Amount);
     }
 }

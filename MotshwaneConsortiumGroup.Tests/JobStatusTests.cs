@@ -3,7 +3,7 @@ using Xunit;
 
 namespace MotshwaneConsortiumGroup.Tests;
 
-/// <summary>Pure logic tests for the Assigned -> In Progress -> Delivered -> Completed rule — no services needed.</summary>
+/// <summary>Pure logic tests for the Assigned -> In Progress -> Delivered -> Completed rule — no database needed.</summary>
 public class JobStatusTests
 {
     [Theory]
@@ -16,11 +16,11 @@ public class JobStatusTests
     }
 
     [Theory]
-    [InlineData(JobStatus.Assigned, JobStatus.Completed)]      // skips two steps
-    [InlineData(JobStatus.Assigned, JobStatus.Delivered)]      // skips one step
-    [InlineData(JobStatus.InProgress, JobStatus.Assigned)]     // backward
-    [InlineData(JobStatus.Completed, JobStatus.Assigned)]      // backward, from the end
-    [InlineData(JobStatus.Assigned, JobStatus.Assigned)]       // no-op, not a valid move
+    [InlineData(JobStatus.Assigned, JobStatus.Completed)]
+    [InlineData(JobStatus.Assigned, JobStatus.Delivered)]
+    [InlineData(JobStatus.InProgress, JobStatus.Assigned)]
+    [InlineData(JobStatus.Completed, JobStatus.Assigned)]
+    [InlineData(JobStatus.Assigned, JobStatus.Assigned)]
     public void CanTransition_SkippingOrBackward_ReturnsFalse(string from, string to)
     {
         Assert.False(JobStatus.CanTransition(from, to));
