@@ -3,12 +3,220 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 <title>@ViewData["Title"] - Motshwane Consortium</title>
-<link rel="stylesheet" href="~/css/site.css" />
+
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
+
 <body>
-<header class="topbar"><div class="nav-inner"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">MC</span><span>Motshwane Consortium</span></a><nav class="main-nav"><a asp-controller="Home" asp-action="Index">Home</a><a asp-controller="Customer" asp-action="Dashboard">Customer</a><a asp-controller="Admin" asp-action="Dashboard">Admin</a><a asp-controller="Staff" asp-action="Dashboard">Staff</a></nav></div></header>
-<main class="container">@if (TempData["Message"] is string message) { <div class="alert success">@message</div> } @RenderBody()</main>
-<footer>© 2026 Motshwane Consortium<br/><small>Mobile Freezer & Toilet Management System</small></footer>
+
+<!-- ACCESSIBILITY: allows keyboard users to skip navigation -->
+<a class="skip-link" href="#main-content">
+Skip to main content
+</a>
+
+
+<!-- HEADER -->
+<header class="mc-header">
+
+<div class="mc-nav-container">
+
+<!-- BRAND -->
+<a asp-controller="Home"
+asp-action="Index"
+class="mc-brand"
+aria-label="Motshwane Consortium home">
+
+<div class="mc-brand-mark">
+MC
+</div>
+
+<div class="mc-brand-text">
+<strong>MOTSHWANE</strong>
+<span>CONSORTIUM</span>
+</div>
+
+</a>
+
+
+<!-- NAVIGATION -->
+<nav class="mc-main-nav"
+aria-label="Main navigation">
+
+<a asp-controller="Home"
+asp-action="Index">
+Home
+</a>
+
+<a asp-controller="Customer"
+asp-action="Browse">
+Services
+</a>
+
+<a asp-controller="Customer"
+asp-action="MyBookings">
+My Bookings
+</a>
+
+<a asp-controller="Admin"
+asp-action="Dashboard">
+Admin
+</a>
+
+<a asp-controller="Staff"
+asp-action="Dashboard">
+Staff
+</a>
+
+</nav>
+
+
+<!-- CUSTOMER ACTIONS -->
+<div class="mc-nav-actions">
+
+    
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+<a asp-controller="Customer"
+asp-action="Logout">
+Sign Out
+</a>
+}
+else
+{
+<a asp-controller="Customer"
+asp-action="Login">
+Sign In
+</a>
+}
+
+
+
+
+<a asp-controller="Customer"
+asp-action="Booking"
+class="mc-nav-book">
+Book Now
+</a>
+
+</div>
+
+</div>
+
+</header>
+
+
+<!-- MAIN CONTENT -->
+<main id="main-content"
+class="mc-page-container"
+tabindex="-1">
+
+@RenderBody()
+
+</main>
+
+
+<!-- FOOTER -->
+<footer class="mc-footer">
+
+<div class="mc-footer-grid">
+
+<div class="mc-footer-brand">
+
+<div class="mc-brand footer-brand">
+
+<div class="mc-brand-mark">
+MC
+</div>
+
+<div class="mc-brand-text">
+<strong>MOTSHWANE</strong>
+<span>CONSORTIUM</span>
+</div>
+
+</div>
+
+<p>
+Reliable mobile freezer and toilet hire
+for every occasion.
+</p>
+
+</div>
+
+
+<div>
+<h4>Customer</h4>
+
+<a asp-controller="Customer"
+asp-action="Browse">
+Browse Services
+</a>
+
+<a asp-controller="Customer"
+asp-action="Booking">
+Make a Booking
+</a>
+
+<a asp-controller="Customer"
+asp-action="MyBookings">
+My Bookings
+</a>
+</div>
+
+
+<div>
+<h4>System</h4>
+
+<a asp-controller="Customer"
+asp-action="Login">
+Customer Login
+</a>
+
+<a asp-controller="Admin"
+asp-action="Dashboard">
+Admin Portal
+</a>
+
+<a asp-controller="Staff"
+asp-action="Dashboard">
+Staff Portal
+</a>
+</div>
+
+
+<div>
+<h4>Our Promise</h4>
+
+<p>
+Clean • Safe<br />
+Reliable • On Time
+</p>
+</div>
+
+</div>
+
+
+<div class="mc-footer-bottom">
+
+<span>
+© @DateTime.Now.Year Motshwane Consortium
+</span>
+
+<span>
+Mobile Freezers & Toilets
+</span>
+
+</div>
+
+</footer>
+
+
+<script src="~/js/site.js"
+asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

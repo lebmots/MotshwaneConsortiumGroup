@@ -1,2 +1,169 @@
-@model IEnumerable<ServiceItem>
-@{ ViewData["Title"]="Browse Services"; }<h1>Browse Freezers & Toilets</h1><div class="filters"><a class="filter" href="/Customer/Browse">All</a><a class="filter" href="/Customer/Browse?category=Freezer">Freezers</a><a class="filter" href="/Customer/Browse?category=Toilet">Toilets</a></div><div class="grid three">@foreach(var item in Model){<div class="card"><span class="pill">@item.Category</span><h3>@item.Name</h3><p>@item.Description</p><div class="price">From R @item.PriceFrom.ToString("N0")</div><p class="availability @(item.Available ? "available" : "unavailable")">@(item.Available ? "Available" : "Unavailable")</p>@if(item.Available){<a class="btn small" href="/Customer/Booking">Book Service</a>}</div>}</div>
+@model IEnumerable<MotshwaneConsortiumGroup.Models.ServiceItem>
+
+@{
+    ViewData["Title"] = "Browse Services";
+    var services = Model?.ToList() ?? new List<MotshwaneConsortiumGroup.Models.ServiceItem>();
+}
+
+<section class="services-header">
+
+    <div>
+        <span class="eyebrow">MOTSHWANE CONSORTIUM</span>
+
+        <h1>Find the right service for your occasion.</h1>
+
+        <p>
+            Browse our mobile freezer and toilet solutions designed
+            for private, corporate and community events.
+        </p>
+    </div>
+
+    <a asp-action="Booking"
+       class="btn mc-primary-btn">
+        Make a Booking
+    </a>
+
+</section>
+
+
+<!-- FILTERS -->
+<section class="service-filter"
+         aria-label="Service filters">
+
+    <div>
+        <span>Filter services</span>
+
+        <div class="filter-buttons">
+
+            <a asp-action="Browse"
+               class="filter-button">
+                All
+            </a>
+
+            <a asp-action="Browse"
+               asp-route-category="Freezer"
+               class="filter-button">
+                Freezers
+            </a>
+
+            <a asp-action="Browse"
+               asp-route-category="Toilet"
+               class="filter-button">
+                Toilets
+            </a>
+
+        </div>
+    </div>
+
+    <span class="service-count">
+        @services.Count service@(services.Count == 1 ? "" : "s") available
+    </span>
+
+</section>
+
+
+<!-- FEATURED REAL SERVICES -->
+<div class="customer-service-grid">
+
+    <article class="customer-service-card">
+
+        <div class="customer-service-photo">
+
+            <img src="~/images/motshwane-freezer.jpeg"
+                 alt="Motshwane Consortium mobile freezer trailer available for hire" />
+
+            <span class="service-type">
+                MOBILE FREEZER
+            </span>
+
+        </div>
+
+        <div class="customer-service-content">
+
+            <div>
+                <span class="eyebrow">COLD STORAGE</span>
+                <h2>Mobile Freezer</h2>
+            </div>
+
+            <p>
+                Reliable mobile cold storage for weddings,
+                parties, corporate functions and other events.
+            </p>
+
+            <div class="service-features">
+                <span>✓ Event ready</span>
+                <span>✓ Mobile solution</span>
+                <span>✓ Reliable cooling</span>
+            </div>
+
+            <a asp-action="Booking"
+               class="btn mc-primary-btn">
+                Book This Service
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <article class="customer-service-card">
+
+        <div class="customer-service-photo">
+
+            <img src="~/images/motshwane-toilet.jpeg"
+                 alt="Motshwane Consortium mobile toilet facility available for hire" />
+
+            <span class="service-type">
+                MOBILE TOILET
+            </span>
+
+        </div>
+
+        <div class="customer-service-content">
+
+            <div>
+                <span class="eyebrow">SANITATION</span>
+                <h2>Mobile Toilet</h2>
+            </div>
+
+            <p>
+                Clean and convenient mobile sanitation suitable
+                for celebrations, memorials and community events.
+            </p>
+
+            <div class="service-features">
+                <span>✓ Clean facilities</span>
+                <span>✓ Private & convenient</span>
+                <span>✓ Event ready</span>
+            </div>
+
+            <a asp-action="Booking"
+               class="btn mc-primary-btn">
+                Book This Service
+            </a>
+
+        </div>
+
+    </article>
+
+</div>
+
+
+<!-- BOOKING CTA -->
+<section class="browse-cta">
+
+    <div>
+        <span class="eyebrow">READY TO GET STARTED?</span>
+        <h2>Plan your service in a few simple steps.</h2>
+        <p>
+            Choose your service and provide your event details
+            through our online booking form.
+        </p>
+    </div>
+
+    <a asp-action="Booking"
+       class="btn mc-gold-btn">
+        Start Booking
+    </a>
+
+</section>

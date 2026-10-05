@@ -1,5 +1,167 @@
-@model IEnumerable<Booking>
-@{ ViewData["Title"]="Customer Dashboard"; }
-<div class="page-head"><div><span class="eyebrow">CUSTOMER PORTAL</span><h1>Customer Dashboard</h1><p>Manage bookings and services.</p></div><a class="btn" href="/Customer/Booking">New Booking</a></div>
-<div class="stats"><div class="stat"><strong>@Model.Count()</strong><span>Total Bookings</span></div><div class="stat"><strong>@Model.Count(x=>x.Status=="Confirmed")</strong><span>Confirmed</span></div><div class="stat"><strong>@Model.Count(x=>x.PaymentStatus=="Paid")</strong><span>Paid</span></div></div>
-<div class="grid four"><a class="card linkcard" href="/Customer/Browse"><h3>Browse Services</h3></a><a class="card linkcard" href="/Customer/Booking"><h3>Make a Booking</h3></a><a class="card linkcard" href="/Customer/UploadProof"><h3>Upload Payment</h3></a><a class="card linkcard" href="/Customer/MyBookings"><h3>My Bookings</h3></a></div>
+@model IEnumerable<MotshwaneConsortiumGroup.Models.Booking>
+
+@{
+    ViewData["Title"] = "Customer Dashboard";
+    var bookings = Model?.ToList() ?? new List<MotshwaneConsortiumGroup.Models.Booking>();
+}
+
+<section class="customer-welcome">
+
+    <div>
+        <span class="eyebrow">CUSTOMER PORTAL</span>
+        <h1>Welcome to Motshwane Consortium</h1>
+        <p>
+            Manage your bookings, browse our services and keep track
+            of your rental requests in one convenient place.
+        </p>
+    </div>
+
+    <a asp-controller="Customer"
+       asp-action="Booking"
+       class="btn mc-primary-btn">
+        + New Booking
+    </a>
+
+</section>
+
+
+<!-- QUICK ACTIONS -->
+<section class="customer-actions">
+
+    <a asp-action="Browse"
+       class="customer-action-card">
+
+        <div class="customer-action-icon">01</div>
+
+        <div>
+            <h3>Browse Services</h3>
+            <p>Explore our mobile freezers and toilets available for hire.</p>
+        </div>
+
+        <strong>→</strong>
+    </a>
+
+
+    <a asp-action="Booking"
+       class="customer-action-card">
+
+        <div class="customer-action-icon">02</div>
+
+        <div>
+            <h3>Make a Booking</h3>
+            <p>Select your service, dates and event information.</p>
+        </div>
+
+        <strong>→</strong>
+    </a>
+
+
+    <a asp-action="UploadProof"
+       class="customer-action-card">
+
+        <div class="customer-action-icon">03</div>
+
+        <div>
+            <h3>Upload Payment</h3>
+            <p>Submit your proof of payment securely.</p>
+        </div>
+
+        <strong>→</strong>
+    </a>
+
+</section>
+
+
+<!-- BOOKING SUMMARY -->
+<section class="customer-dashboard-section">
+
+    <div class="mc-section-heading">
+
+        <div>
+            <span class="eyebrow">BOOKING ACTIVITY</span>
+            <h2>Your bookings</h2>
+        </div>
+
+        <a asp-action="MyBookings"
+           class="mc-text-link">
+            View booking history →
+        </a>
+
+    </div>
+
+
+    @if (bookings.Any())
+    {
+        <div class="customer-booking-list">
+
+            @foreach (var booking in bookings.Take(3))
+            {
+                <article class="customer-booking-card">
+
+                    <div class="booking-reference">
+                        <span>BOOKING</span>
+                        <strong>@booking.Reference</strong>
+                    </div>
+
+                    <div class="booking-detail">
+                        <span>Service</span>
+                        <strong>@booking.Service</strong>
+                    </div>
+
+                    <div class="booking-detail">
+                        <span>Date</span>
+                        <strong>@booking.BookingDate.ToString("dd MMM yyyy")</strong>
+                    </div>
+
+                    <div class="booking-detail">
+                        <span>Status</span>
+                        <strong class="customer-status">
+                            @booking.Status
+                        </strong>
+                    </div>
+
+                </article>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="customer-empty-state">
+            <div class="empty-icon">+</div>
+
+            <h3>No bookings yet</h3>
+
+            <p>
+                When you make a booking, you will be able
+                to track its progress here.
+            </p>
+
+            <a asp-action="Booking"
+               class="btn mc-primary-btn">
+                Make Your First Booking
+            </a>
+        </div>
+    }
+
+</section>
+
+
+<!-- HELP -->
+<section class="customer-help">
+
+    <div>
+        <span class="eyebrow">NEED ASSISTANCE?</span>
+        <h2>We're here to help.</h2>
+        <p>
+            Motshwane Consortium provides reliable support throughout
+            your booking and service experience.
+        </p>
+    </div>
+
+    <a asp-action="Browse"
+       class="btn mc-outline-light">
+        View Services
+    </a>
+
+</section>

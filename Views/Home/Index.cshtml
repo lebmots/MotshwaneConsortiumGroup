@@ -1,3 +1,398 @@
-@{ ViewData["Title"] = "Welcome"; }
-<section class="hero"><span class="eyebrow">MOBILE FREEZER & TOILET MANAGEMENT</span><h1>Reliable mobile services, managed simply.</h1><p>Browse services, request bookings, submit payment proof and track service progress from one platform.</p><div class="actions"><a class="btn" href="/Customer/Register">Create Account</a><a class="btn secondary" href="/Customer/Browse">Browse Services</a></div></section>
-<h2>Choose a portal</h2><div class="grid three"><a class="card linkcard" href="/Customer/Dashboard"><h3>Customer</h3><p>Book services and manage requests.</p></a><a class="card linkcard" href="/Admin/Dashboard"><h3>Admin</h3><p>Manage operations.</p></a><a class="card linkcard" href="/Staff/Dashboard"><h3>Staff</h3><p>Manage assigned jobs.</p></a></div>
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- HERO SECTION -->
+<section class="mc-hero">
+
+    <div class="mc-hero-content">
+
+        <span class="mc-kicker">
+            CLEAN • SAFE • RELIABLE • ON TIME
+        </span>
+
+        <h1>
+            Mobile Freezers & Toilets
+            <span>for every occasion.</span>
+        </h1>
+
+        <p>
+            Reliable mobile freezer and toilet hire for weddings,
+            parties, corporate events, memorial services and
+            community events.
+        </p>
+
+        <div class="mc-hero-actions">
+
+            <a asp-controller="Customer"
+               asp-action="Browse"
+               class="btn mc-primary-btn">
+                Browse Services
+            </a>
+
+            <a asp-controller="Customer"
+               asp-action="Booking"
+               class="btn mc-outline-btn">
+                Make a Booking
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="mc-hero-image">
+
+        <img src="~/images/motshwane-brand.jpeg"
+             alt="Motshwane Consortium mobile freezer and toilet hire services" />
+
+    </div>
+
+</section>
+
+
+<!-- INTRODUCTION -->
+<section class="mc-section mc-intro">
+
+    <span class="eyebrow">
+        MOTSHWANE CONSORTIUM
+    </span>
+
+    <h2>
+        Your partner for every occasion
+    </h2>
+
+    <p>
+        From intimate celebrations to large community events,
+        Motshwane Consortium provides dependable mobile freezer
+        and sanitation solutions designed to make event planning easier.
+    </p>
+
+
+    <div class="mc-benefits">
+
+        <div class="mc-benefit">
+
+            <span>✓</span>
+
+            <div>
+                <strong>Clean</strong>
+                <small>Well-maintained equipment</small>
+            </div>
+
+        </div>
+
+
+        <div class="mc-benefit">
+
+            <span>✓</span>
+
+            <div>
+                <strong>Reliable</strong>
+                <small>Dependable service</small>
+            </div>
+
+        </div>
+
+
+        <div class="mc-benefit">
+
+            <span>✓</span>
+
+            <div>
+                <strong>Convenient</strong>
+                <small>Simple online booking</small>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- SERVICES -->
+<section class="mc-section">
+
+    <div class="mc-section-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                OUR SERVICES
+            </span>
+
+            <h2>
+                Equipment available for hire
+            </h2>
+
+        </div>
+
+        <a asp-controller="Customer"
+           asp-action="Browse"
+           class="mc-text-link">
+            View all services →
+        </a>
+
+    </div>
+
+
+    <div class="mc-service-grid">
+
+        <!-- MOBILE FREEZER -->
+        <article class="mc-service-card">
+
+            <div class="mc-service-image">
+
+                <img src="~/images/motshwane-freezer.jpeg"
+                     alt="Motshwane Consortium mobile freezer available for hire" />
+
+                <span class="mc-service-badge">
+                    Mobile Freezer
+                </span>
+
+            </div>
+
+
+            <div class="mc-service-body">
+
+                <h3>
+                    Mobile Freezer Hire
+                </h3>
+
+                <p>
+                    Convenient cold-storage solutions for events,
+                    functions and temporary storage requirements.
+                </p>
+
+                <a asp-controller="Customer"
+                   asp-action="Booking"
+                   class="btn mc-card-btn">
+                    Book a Freezer
+                </a>
+
+            </div>
+
+        </article>
+
+
+        <!-- MOBILE TOILET -->
+        <article class="mc-service-card">
+
+            <div class="mc-service-image">
+
+                <img src="~/images/motshwane-toilet.jpeg"
+                     alt="Motshwane Consortium mobile toilet available for hire" />
+
+                <span class="mc-service-badge">
+                    Mobile Toilet
+                </span>
+
+            </div>
+
+
+            <div class="mc-service-body">
+
+                <h3>
+                    Mobile Toilet Hire
+                </h3>
+
+                <p>
+                    Clean and convenient sanitation facilities suitable
+                    for private functions, corporate events and
+                    community gatherings.
+                </p>
+
+                <a asp-controller="Customer"
+                   asp-action="Booking"
+                   class="btn mc-card-btn">
+                    Book a Toilet
+                </a>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- OCCASIONS -->
+<section class="mc-occasions">
+
+    <span class="eyebrow">
+        BUILT FOR EVERY OCCASION
+    </span>
+
+    <h2>
+        Whatever you're planning, we're ready.
+    </h2>
+
+
+    <div class="mc-occasion-grid">
+
+        <div>
+            <span>♡</span>
+            <strong>Weddings</strong>
+        </div>
+
+        <div>
+            <span>✦</span>
+            <strong>Parties</strong>
+        </div>
+
+        <div>
+            <span>▣</span>
+            <strong>Corporate Events</strong>
+        </div>
+
+        <div>
+            <span>✧</span>
+            <strong>Memorial Services</strong>
+        </div>
+
+        <div>
+            <span>◉</span>
+            <strong>Community Events</strong>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- SYSTEM PORTALS -->
+<section class="mc-section">
+
+    <div class="mc-section-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                SYSTEM ACCESS
+            </span>
+
+            <h2>
+                Access your portal
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="mc-portal-grid">
+
+        <!-- CUSTOMER -->
+        <a asp-controller="Customer"
+           asp-action="Dashboard"
+           class="mc-portal-card">
+
+            <span class="mc-portal-icon">
+                01
+            </span>
+
+            <div>
+
+                <h3>
+                    Customer Portal
+                </h3>
+
+                <p>
+                    Create bookings, upload payment proof
+                    and track your services.
+                </p>
+
+            </div>
+
+            <strong>→</strong>
+
+        </a>
+
+
+        <!-- ADMIN -->
+        <a asp-controller="Admin"
+           asp-action="Dashboard"
+           class="mc-portal-card">
+
+            <span class="mc-portal-icon">
+                02
+            </span>
+
+            <div>
+
+                <h3>
+                    Admin Portal
+                </h3>
+
+                <p>
+                    Manage bookings, customers, services,
+                    payments and staff.
+                </p>
+
+            </div>
+
+            <strong>→</strong>
+
+        </a>
+
+
+        <!-- STAFF -->
+        <a asp-controller="Staff"
+           asp-action="Dashboard"
+           class="mc-portal-card">
+
+            <span class="mc-portal-icon">
+                03
+            </span>
+
+            <div>
+
+                <h3>
+                    Staff Portal
+                </h3>
+
+                <p>
+                    View assigned jobs and update
+                    service progress.
+                </p>
+
+            </div>
+
+            <strong>→</strong>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- CALL TO ACTION -->
+<section class="mc-cta">
+
+    <div>
+
+        <span class="mc-kicker">
+            READY TO BOOK?
+        </span>
+
+        <h2>
+            Let us take care of the essentials.
+        </h2>
+
+        <p>
+            Select the service you need and submit
+            your booking request online.
+        </p>
+
+    </div>
+
+
+    <a asp-controller="Customer"
+       asp-action="Booking"
+       class="btn mc-gold-btn">
+        Book Now
+    </a>
+
+</section>

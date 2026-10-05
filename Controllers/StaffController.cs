@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using MotshwaneConsortiumGroup.Services;
+using Microsoft.AspNetCore.Authorization;
+
 namespace MotshwaneConsortiumGroup.Controllers;
+
+[Authorize(Roles = "Staff")]
 public class StaffController : Controller
 {
     private readonly DemoDataService _data;

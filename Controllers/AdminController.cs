@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using MotshwaneConsortiumGroup.Services;
 namespace MotshwaneConsortiumGroup.Controllers;
+
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly DemoDataService _data;
