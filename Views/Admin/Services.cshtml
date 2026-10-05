@@ -1,2 +1,9 @@
-@model IEnumerable<ServiceItem>
-@{ ViewData["Title"]="Manage Services"; }<h1>Manage Freezers & Toilets</h1><div class="grid three">@foreach(var s in Model){<div class="card"><span class="pill">@s.Category</span><h3>@s.Name</h3><p>@s.Description</p><strong>From R @s.PriceFrom.ToString("N0")</strong></div>}</div>
+@model IEnumerable<Unit>
+@{
+    ViewData["Title"] = "Services";
+}
+<h1>Manage Services</h1>
+<div class="table-wrap"><table><thead><tr><th>Name</th><th>Category</th><th>Description</th><th>Price From</th><th>Available</th></tr></thead><tbody>@foreach(var s in Model){
+    <tr><td>@s.Name</td><td>@s.Category</td><td>@s.Description</td><td>R @s.PriceFrom.ToString("N0")</td><td>@(s.Available ? "Yes" : "No")</td></tr>
+}
+</tbody></table></div>
