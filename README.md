@@ -6,7 +6,11 @@ The system aims to simplify the booking process for customers while providing ad
 
 This project is being developed as part of our Work Integrated Learning (WIL) implementation project.
 
+## Presentations
+1. Lebone - https://youtu.be/PRCLVPXMwSc?si=gIp0ELWKUGumGh3p 
+2. Thato - https://youtu.be/4k14rLwxulM
 
+The system is designed to:
 
 ## Project Objectives
 
