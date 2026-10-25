@@ -1,0 +1,14 @@
+﻿namespace MotshwaneConsortiumGroup.Models;
+
+/// <summary>A rentable item (a specific freezer or toilet). Replaces the old ServiceItem model —
+/// same fields, renamed by Thato to match the database/API naming.</summary>
+public class Unit
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public string Category { get; set; } = "";
+    public string Description { get; set; } = "";
+    public decimal PriceFrom { get; set; }
+    public bool Available { get; set; }
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+}

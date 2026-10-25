@@ -1,169 +1,199 @@
-@model IEnumerable<MotshwaneConsortiumGroup.Models.ServiceItem>
+
+@model IEnumerable<MotshwaneConsortiumGroup.Models.Unit>
 
 @{
-    ViewData["Title"] = "Browse Services";
-    var services = Model?.ToList() ?? new List<MotshwaneConsortiumGroup.Models.ServiceItem>();
+ViewData["Title"] = "Browse Services";
+
+var services = Model?.ToList()
+?? new List<MotshwaneConsortiumGroup.Models.Unit>();
 }
 
+<!-- SERVICES HEADER -->
 <section class="services-header">
 
-    <div>
-        <span class="eyebrow">MOTSHWANE CONSORTIUM</span>
+<div>
+<span class="eyebrow">MOTSHWANE CONSORTIUM</span>
 
-        <h1>Find the right service for your occasion.</h1>
+<h1>Find the right service for your occasion.</h1>
 
-        <p>
-            Browse our mobile freezer and toilet solutions designed
-            for private, corporate and community events.
-        </p>
-    </div>
+<p>
+Browse our mobile freezer and toilet solutions designed
+for private, corporate and community events.
+</p>
+</div>
 
-    <a asp-action="Booking"
-       class="btn mc-primary-btn">
-        Make a Booking
-    </a>
-
-</section>
-
-
-<!-- FILTERS -->
-<section class="service-filter"
-         aria-label="Service filters">
-
-    <div>
-        <span>Filter services</span>
-
-        <div class="filter-buttons">
-
-            <a asp-action="Browse"
-               class="filter-button">
-                All
-            </a>
-
-            <a asp-action="Browse"
-               asp-route-category="Freezer"
-               class="filter-button">
-                Freezers
-            </a>
-
-            <a asp-action="Browse"
-               asp-route-category="Toilet"
-               class="filter-button">
-                Toilets
-            </a>
-
-        </div>
-    </div>
-
-    <span class="service-count">
-        @services.Count service@(services.Count == 1 ? "" : "s") available
-    </span>
+<a asp-controller="Customer"
+asp-action="Booking"
+class="btn mc-primary-btn">
+Make a Booking
+</a>
 
 </section>
 
 
-<!-- FEATURED REAL SERVICES -->
+<!-- SERVICE FILTERS -->
+<section class="service-filter" aria-label="Service filters">
+
+<div>
+<span>Filter services</span>
+
+<div class="filter-buttons">
+
+<a asp-controller="Customer"
+asp-action="Browse"
+class="filter-button">
+All
+</a>
+
+<a asp-controller="Customer"
+asp-action="Browse"
+asp-route-category="Freezer"
+class="filter-button">
+Freezers
+</a>
+
+<a asp-controller="Customer"
+asp-action="Browse"
+asp-route-category="Toilet"
+class="filter-button">
+Toilets
+</a>
+
+</div>
+</div>
+
+<span class="service-count">
+@services.Count service@(services.Count == 1 ? "" : "s") found
+</span>
+
+</section>
+
+
+<!-- DATABASE-BACKED SERVICE CARDS -->
 <div class="customer-service-grid">
 
-    <article class="customer-service-card">
+@foreach (var item in services)
+{
+var isFreezer = item.Category?.Equals(
+"Freezer",
+StringComparison.OrdinalIgnoreCase) == true;
 
-        <div class="customer-service-photo">
+var imagePath = isFreezer
+? "~/images/motshwane-freezer.jpeg"
+: "~/images/motshwane-toilet.jpeg";
 
-            <img src="~/images/motshwane-freezer.jpeg"
-                 alt="Motshwane Consortium mobile freezer trailer available for hire" />
+<article class="customer-service-card">
 
-            <span class="service-type">
-                MOBILE FREEZER
-            </span>
+<div class="customer-service-photo">
 
-        </div>
+<img src="@Url.Content(imagePath)"
+alt="@item.Name available for hire" />
 
-        <div class="customer-service-content">
+<span class="service-type">
+@item.Category
+</span>
 
-            <div>
-                <span class="eyebrow">COLD STORAGE</span>
-                <h2>Mobile Freezer</h2>
-            </div>
+</div>
 
-            <p>
-                Reliable mobile cold storage for weddings,
-                parties, corporate functions and other events.
-            </p>
+<div class="customer-service-content">
 
-            <div class="service-features">
-                <span>✓ Event ready</span>
-                <span>✓ Mobile solution</span>
-                <span>✓ Reliable cooling</span>
-            </div>
+<div>
+<span class="eyebrow">
+@(isFreezer ? "COLD STORAGE" : "SANITATION")
+</span>
 
-            <a asp-action="Booking"
-               class="btn mc-primary-btn">
-                Book This Service
-            </a>
+<h2>@item.Name</h2>
+</div>
 
-        </div>
+<p>@item.Description</p>
 
-    </article>
+<div class="service-features">
+@if (isFreezer)
+{
+<span>✓ Event ready</span>
+<span>✓ Mobile solution</span>
+<span>✓ Reliable cooling</span>
+}
+else
+{
+<span>✓ Clean facilities</span>
+<span>✓ Private &amp; convenient</span>
+<span>✓ Event ready</span>
+}
+</div>
 
+<div class="price">
+From R @item.PriceFrom.ToString("N0")
+</div>
 
-    <article class="customer-service-card">
+<p class="availability @(item.Available ? "available" : "unavailable")">
+@(item.Available ? "Available" : "Unavailable")
+</p>
 
-        <div class="customer-service-photo">
+@if (item.Available)
+{
+<a asp-controller="Customer"
+asp-action="Booking"
+class="btn mc-primary-btn">
+Book This Service
+</a>
+}
+else
+{
+<span class="service-unavailable">
+Currently unavailable
+</span>
+}
 
-            <img src="~/images/motshwane-toilet.jpeg"
-                 alt="Motshwane Consortium mobile toilet facility available for hire" />
+</div>
 
-            <span class="service-type">
-                MOBILE TOILET
-            </span>
-
-        </div>
-
-        <div class="customer-service-content">
-
-            <div>
-                <span class="eyebrow">SANITATION</span>
-                <h2>Mobile Toilet</h2>
-            </div>
-
-            <p>
-                Clean and convenient mobile sanitation suitable
-                for celebrations, memorials and community events.
-            </p>
-
-            <div class="service-features">
-                <span>✓ Clean facilities</span>
-                <span>✓ Private & convenient</span>
-                <span>✓ Event ready</span>
-            </div>
-
-            <a asp-action="Booking"
-               class="btn mc-primary-btn">
-                Book This Service
-            </a>
-
-        </div>
-
-    </article>
+</article>
+}
 
 </div>
 
 
-<!-- BOOKING CTA -->
+<!-- EMPTY STATE -->
+@if (!services.Any())
+{
+<section class="browse-cta">
+<div>
+<h2>No services found</h2>
+<p>
+There are currently no services matching
+your selected category.
+</p>
+</div>
+
+<a asp-controller="Customer"
+asp-action="Browse"
+class="btn mc-gold-btn">
+View All Services
+</a>
+</section>
+}
+
+
+<!-- BOOKING CALL TO ACTION -->
 <section class="browse-cta">
 
-    <div>
-        <span class="eyebrow">READY TO GET STARTED?</span>
-        <h2>Plan your service in a few simple steps.</h2>
-        <p>
-            Choose your service and provide your event details
-            through our online booking form.
-        </p>
-    </div>
+<div>
+<span class="eyebrow">READY TO GET STARTED?</span>
 
-    <a asp-action="Booking"
-       class="btn mc-gold-btn">
-        Start Booking
-    </a>
+<h2>Plan your service in a few simple steps.</h2>
+
+<p>
+Choose your service and provide your event details
+through our online booking form.
+</p>
+</div>
+
+<a asp-controller="Customer"
+asp-action="Booking"
+class="btn mc-gold-btn">
+Start Booking
+</a>
 
 </section>
+
+
