@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using MotshwaneConsortiumGroup.Data;
 using MotshwaneConsortiumGroup.Extensions;
-using MotshwaneConsortiumGroup.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,8 +43,6 @@ builder.Configuration.GetConnectionString("DefaultConnection")));
 // Register database-backed business services
 builder.Services.AddApplicationServices();
 
-// Keep temporarily for any remaining demo-based controllers
-builder.Services.AddSingleton<DemoDataService>();
 
 // ---------------- SWAGGER / REST API ----------------
 
