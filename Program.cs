@@ -58,7 +58,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-<<<<<<< HEAD
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
     sql => sql.EnableRetryOnFailure(
@@ -67,9 +67,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         errorNumbersToAdd: null)));
 
 builder.Services.AddApplicationServices();
-=======
 // ---------------- BUILD APPLICATION ----------------
->>>>>>> f50571c47347a7a67783b2283a6d4128e81a653d
 
 var app = builder.Build();
 
