@@ -1,2 +1,199 @@
-@model IEnumerable<Unit>
-@{ ViewData["Title"]="Browse Services"; }<h1>Browse Freezers & Toilets</h1><div class="filters"><a class="filter" href="/Customer/Browse">All</a><a class="filter" href="/Customer/Browse?category=Freezer">Freezers</a><a class="filter" href="/Customer/Browse?category=Toilet">Toilets</a></div><div class="grid three">@foreach(var item in Model){<div class="card"><span class="pill">@item.Category</span><h3>@item.Name</h3><p>@item.Description</p><div class="price">From R @item.PriceFrom.ToString("N0")</div><p class="availability @(item.Available ? "available" : "unavailable")">@(item.Available ? "Available" : "Unavailable")</p>@if(item.Available){<a class="btn small" href="/Customer/Booking">Book Service</a>}</div>}</div>
+
+@model IEnumerable<MotshwaneConsortiumGroup.Models.Unit>
+
+@{
+ViewData["Title"] = "Browse Services";
+
+var services = Model?.ToList()
+?? new List<MotshwaneConsortiumGroup.Models.Unit>();
+}
+
+<!-- SERVICES HEADER -->
+<section class="services-header">
+
+<div>
+<span class="eyebrow">MOTSHWANE CONSORTIUM</span>
+
+<h1>Find the right service for your occasion.</h1>
+
+<p>
+Browse our mobile freezer and toilet solutions designed
+for private, corporate and community events.
+</p>
+</div>
+
+<a asp-controller="Customer"
+asp-action="Booking"
+class="btn mc-primary-btn">
+Make a Booking
+</a>
+
+</section>
+
+
+<!-- SERVICE FILTERS -->
+<section class="service-filter" aria-label="Service filters">
+
+<div>
+<span>Filter services</span>
+
+<div class="filter-buttons">
+
+<a asp-controller="Customer"
+asp-action="Browse"
+class="filter-button">
+All
+</a>
+
+<a asp-controller="Customer"
+asp-action="Browse"
+asp-route-category="Freezer"
+class="filter-button">
+Freezers
+</a>
+
+<a asp-controller="Customer"
+asp-action="Browse"
+asp-route-category="Toilet"
+class="filter-button">
+Toilets
+</a>
+
+</div>
+</div>
+
+<span class="service-count">
+@services.Count service@(services.Count == 1 ? "" : "s") found
+</span>
+
+</section>
+
+
+<!-- DATABASE-BACKED SERVICE CARDS -->
+<div class="customer-service-grid">
+
+@foreach (var item in services)
+{
+var isFreezer = item.Category?.Equals(
+"Freezer",
+StringComparison.OrdinalIgnoreCase) == true;
+
+var imagePath = isFreezer
+? "~/images/motshwane-freezer.jpeg"
+: "~/images/motshwane-toilet.jpeg";
+
+<article class="customer-service-card">
+
+<div class="customer-service-photo">
+
+<img src="@Url.Content(imagePath)"
+alt="@item.Name available for hire" />
+
+<span class="service-type">
+@item.Category
+</span>
+
+</div>
+
+<div class="customer-service-content">
+
+<div>
+<span class="eyebrow">
+@(isFreezer ? "COLD STORAGE" : "SANITATION")
+</span>
+
+<h2>@item.Name</h2>
+</div>
+
+<p>@item.Description</p>
+
+<div class="service-features">
+@if (isFreezer)
+{
+<span>✓ Event ready</span>
+<span>✓ Mobile solution</span>
+<span>✓ Reliable cooling</span>
+}
+else
+{
+<span>✓ Clean facilities</span>
+<span>✓ Private &amp; convenient</span>
+<span>✓ Event ready</span>
+}
+</div>
+
+<div class="price">
+From R @item.PriceFrom.ToString("N0")
+</div>
+
+<p class="availability @(item.Available ? "available" : "unavailable")">
+@(item.Available ? "Available" : "Unavailable")
+</p>
+
+@if (item.Available)
+{
+<a asp-controller="Customer"
+asp-action="Booking"
+class="btn mc-primary-btn">
+Book This Service
+</a>
+}
+else
+{
+<span class="service-unavailable">
+Currently unavailable
+</span>
+}
+
+</div>
+
+</article>
+}
+
+</div>
+
+
+<!-- EMPTY STATE -->
+@if (!services.Any())
+{
+<section class="browse-cta">
+<div>
+<h2>No services found</h2>
+<p>
+There are currently no services matching
+your selected category.
+</p>
+</div>
+
+<a asp-controller="Customer"
+asp-action="Browse"
+class="btn mc-gold-btn">
+View All Services
+</a>
+</section>
+}
+
+
+<!-- BOOKING CALL TO ACTION -->
+<section class="browse-cta">
+
+<div>
+<span class="eyebrow">READY TO GET STARTED?</span>
+
+<h2>Plan your service in a few simple steps.</h2>
+
+<p>
+Choose your service and provide your event details
+through our online booking form.
+</p>
+</div>
+
+<a asp-controller="Customer"
+asp-action="Booking"
+class="btn mc-gold-btn">
+Start Booking
+</a>
+
+</section>
+
+

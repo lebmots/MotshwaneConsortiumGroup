@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using MotshwaneConsortiumGroup.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+
 namespace MotshwaneConsortiumGroup.Controllers;
+
+[Authorize(Roles = "Staff")]
 public class StaffController : Controller
 {
     private readonly IStaffJobService _jobs;
