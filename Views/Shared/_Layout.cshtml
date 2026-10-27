@@ -80,10 +80,12 @@ Staff
 
 @if (User.Identity?.IsAuthenticated == true)
 {
-<a asp-controller="Customer"
-asp-action="Logout">
-Sign Out
-</a>
+    <form asp-controller="Customer" asp-action="Logout" method="post" style="display:inline">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="mc-login-link mc-link-button">
+            Sign Out
+        </button>
+    </form>
 }
 else
 {

@@ -22,12 +22,14 @@
                 Return Home
             </a>
 
-            <a asp-controller="Customer"
-               asp-action="Logout"
-               class="btn btn-outline-secondary ms-2">
-                Sign Out
-            </a>
-        </div>
+            <form asp-controller="Customer" asp-action="Logout" method="post" style="display:inline-block; margin-left:10px;">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn secondary">
+            Sign Out
+        </button>
+    </form>
+
+     </div>
     </div>
 </div>
 

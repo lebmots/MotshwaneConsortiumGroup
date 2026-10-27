@@ -131,64 +131,48 @@ public class CustomerController : Controller
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(
-    string email,
-    string password)
+    public async Task<IActionResult> Login(string email, string password)
     {
-        if (string.IsNullOrWhiteSpace(email) ||
-        string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            ModelState.AddModelError(
-            "", "Please enter your email and password.");
+            ModelState.AddModelError("", "Please enter your email and password.");
             return View();
         }
 
         email = email.Trim().ToLowerInvariant();
 
         var user = await _context.Users
-        .Include(u => u.Role)
-        .Include(u => u.Customer)
-        .FirstOrDefaultAsync(u => u.Email == email);
+            .Include(u => u.Role)
+            .Include(u => u.Customer)
+            .FirstOrDefaultAsync(u => u.Email == email);
 
         if (user is null ||
-        _passwordHasher.VerifyHashedPassword(
-        user,
-        user.PasswordHash,
-        password) == PasswordVerificationResult.Failed)
+            _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
         {
-            ModelState.AddModelError(
-            "", "Invalid email or password.");
-            return View();
-        }
-
-        if (user.Customer is null ||
-        user.Role.Name != "Customer")
-        {
-            ModelState.AddModelError(
-            "", "This account is not linked to a customer profile.");
+            ModelState.AddModelError("", "Invalid email or password.");
             return View();
         }
 
         var claims = new List<Claim>
-{
-new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-new(ClaimTypes.Name, user.FullName),
-new(ClaimTypes.Email, user.Email),
-new(ClaimTypes.Role, user.Role.Name),
-new("CustomerId", user.Customer.Id.ToString())
-};
+    {
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new(ClaimTypes.Name, user.FullName),
+        new(ClaimTypes.Email, user.Email),
+        new(ClaimTypes.Role, user.Role.Name),
+    };
+        if (user.Customer is not null)
+            claims.Add(new Claim("CustomerId", user.Customer.Id.ToString()));
 
-        var identity = new ClaimsIdentity(
-        claims,
-        CookieAuthenticationDefaults.AuthenticationScheme);
-
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-        await HttpContext.SignInAsync(
-        CookieAuthenticationDefaults.AuthenticationScheme,
-        principal);
-
-        return RedirectToAction(nameof(Dashboard));
+        return user.Role.Name switch
+        {
+            "Admin" => RedirectToAction("Dashboard", "Admin"),
+            "Staff" => RedirectToAction("Dashboard", "Staff"),
+            _ => RedirectToAction(nameof(Dashboard)),
+        };
     }
 
     // ---------------- LOGOUT ----------------
