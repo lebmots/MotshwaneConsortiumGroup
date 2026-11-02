@@ -18,6 +18,7 @@
                 <th>Location</th>
                 <th>Status</th>
                 <th>Payment</th>
+                <th>Action</th>
             </tr>
         </thead>
 
@@ -53,6 +54,14 @@
                         <td>
                             @b.PaymentStatus
                         </td>
+                        <td>
+                            <a asp-controller="Customer"
+                               asp-action="UploadProof"
+                               class="btn btn-success btn-sm">
+                                Upload Proof
+                            </a>
+                        </td>
+
                     </tr>
                 }
             }
