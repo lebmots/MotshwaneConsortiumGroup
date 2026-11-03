@@ -842,8 +842,13 @@ textarea {
             font-size: .8rem;
         }
 
-    .mc-login-link {
+    a.mc-login-link {
         display: none;
+    }
+
+    .mc-link-button {
+        font-size: .8rem;
+        padding: 8px 6px;
     }
 
     .mc-nav-book {
